@@ -39,6 +39,8 @@
 #include "cartographer/transform/transform.h"
 #include "glog/logging.h"
 
+bool MatchSubmap::s_full_match_submap_ = false; // static init
+
 namespace cartographer {
 namespace mapping {
 namespace constraints {
@@ -218,10 +220,12 @@ void ConstraintBuilder2D::ComputeConstraint(
       CHECK_GE(submap_id.trajectory_id, 0);
       kGlobalConstraintsFoundMetric->Increment();
       kGlobalConstraintScoresMetric->Observe(score);
+      MatchSubmap::setFullMatchSubmap(true); // added by Gunther
     } else {
       return;
     }
   } else {
+    // MatchSubmap::setFullMatchSubmap(false);
     kConstraintsSearchedMetric->Increment();
     if (submap_scan_matcher.fast_correlative_scan_matcher->Match(
             initial_pose, constant_data->filtered_gravity_aligned_point_cloud,
@@ -230,6 +234,7 @@ void ConstraintBuilder2D::ComputeConstraint(
       CHECK_GT(score, options_.min_score());
       kConstraintsFoundMetric->Increment();
       kConstraintScoresMetric->Observe(score);
+      /// 추가로 계속 수행 됨;
     } else {
       return;
     }

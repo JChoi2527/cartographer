@@ -38,6 +38,8 @@
 #include "cartographer/transform/transform.h"
 #include "glog/logging.h"
 
+int MatchSubmap::s_inserted_submap_num = 0; //static init
+
 namespace cartographer {
 namespace mapping {
 
@@ -147,6 +149,8 @@ NodeId PoseGraph2D::AppendNode(
     data_.submap_data.at(submap_id).submap = insertion_submaps.back();
     LOG(INFO) << "Inserted submap " << submap_id << ".";
     kActiveSubmapsMetric->Increment();
+    LOG(INFO) << "submap number " << MatchSubmap::s_inserted_submap_num;
+    MatchSubmap::s_inserted_submap_num++;
   }
   return node_id;
 }
@@ -535,7 +539,8 @@ void PoseGraph2D::DrainWorkQueue() {
     }
     process_work_queue = work_item() == WorkItem::Result::kDoNotRunOptimization;
   }
-  LOG(INFO) << "Remaining work items in queue: " << work_queue_size;
+//   commented out by Gunther (Nov 14, 2023)
+//   LOG(INFO) << "Remaining work items in queue: " << work_queue_size;
   // We have to optimize again.
   constraint_builder_.WhenDone(
       [this](const constraints::ConstraintBuilder2D::Result& result) {
@@ -844,7 +849,7 @@ void PoseGraph2D::RunFinalOptimization() {
       absl::MutexLock locker(&mutex_);
       optimization_problem_->SetMaxNumIterations(
           options_.max_num_final_iterations());
-      return WorkItem::Result::kRunOptimization;
+      return WorkItem::Result::kRunOptimization; 
     });
     AddWorkItem([this]() LOCKS_EXCLUDED(mutex_) {
       absl::MutexLock locker(&mutex_);

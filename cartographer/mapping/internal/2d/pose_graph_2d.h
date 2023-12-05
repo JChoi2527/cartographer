@@ -48,6 +48,7 @@
 #include "cartographer/sensor/point_cloud.h"
 #include "cartographer/transform/rigid_transform.h"
 #include "cartographer/transform/transform.h"
+#include "cartographer/mapping/2d/match_submap.h"
 
 namespace cartographer {
 namespace mapping {

@@ -40,6 +40,7 @@
 #include "cartographer/metrics/family_factory.h"
 #include "cartographer/sensor/internal/voxel_filter.h"
 #include "cartographer/sensor/point_cloud.h"
+#include "cartographer/mapping/2d/match_submap.h"
 
 namespace cartographer {
 namespace mapping {
