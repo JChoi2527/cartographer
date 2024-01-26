@@ -220,6 +220,8 @@ void ConstraintBuilder2D::ComputeConstraint(
       CHECK_GE(submap_id.trajectory_id, 0);
       kGlobalConstraintsFoundMetric->Increment();
       kGlobalConstraintScoresMetric->Observe(score);
+      //jylee modified 2014-01-20
+      localGuess= std::make_unique<transform::Rigid2d>(pose_estimate.translation(), pose_estimate.rotation());
       MatchSubmap::setFullMatchSubmap(true); // added by Gunther
     } else {
       return;
@@ -235,6 +237,8 @@ void ConstraintBuilder2D::ComputeConstraint(
       kConstraintsFoundMetric->Increment();
       kConstraintScoresMetric->Observe(score);
       /// 추가로 계속 수행 됨;
+      //jylee modified 2014-01-20
+      localGuess= std::make_unique<transform::Rigid2d>(pose_estimate.translation(), pose_estimate.rotation());
     } else {
       return;
     }
@@ -253,8 +257,22 @@ void ConstraintBuilder2D::ComputeConstraint(
                             *submap_scan_matcher.grid, &pose_estimate,
                             &unused_summary);
 
+  //jylee modified 2014-01-20
+  const auto& submapPoseInverse = ComputeSubmapPose(*submap).inverse();
   const transform::Rigid2d constraint_transform =
-      ComputeSubmapPose(*submap).inverse() * pose_estimate;
+      submapPoseInverse * pose_estimate;
+  const transform::Rigid2d constraint_transform_local_guess =
+      submapPoseInverse * (*localGuess);
+  const transform::Rigid2d constraint_transform_global_guess =
+      submapPoseInverse * (*globalGuess);
+
+  if (match_full_submap)
+  {
+    if ((constraint_transform_global_guess.inverse() * constraint_transform_local_guess).translation().norm() > 2.0 )
+      return;
+  }
+  //
+
   constraint->reset(new Constraint{submap_id,
                                    node_id,
                                    {transform::Embed3D(constraint_transform),

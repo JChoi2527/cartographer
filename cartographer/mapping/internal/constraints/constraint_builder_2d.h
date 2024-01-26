@@ -168,6 +168,9 @@ class ConstraintBuilder2D {
 
   // Histogram of scan matcher scores.
   common::Histogram score_histogram_ GUARDED_BY(mutex_);
+
+  std::unique_ptr<transform::Rigid2d> localGuess = std::unique_ptr<transform::Rigid2d>();
+  std::unique_ptr<transform::Rigid2d> globalGuess = std::unique_ptr<transform::Rigid2d>();
 };
 
 }  // namespace constraints
