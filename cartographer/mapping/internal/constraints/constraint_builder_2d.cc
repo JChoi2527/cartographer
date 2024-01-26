@@ -255,12 +255,24 @@ void ConstraintBuilder2D::ComputeConstraint(
 
   const transform::Rigid2d constraint_transform =
       ComputeSubmapPose(*submap).inverse() * pose_estimate;
-  constraint->reset(new Constraint{submap_id,
-                                   node_id,
-                                   {transform::Embed3D(constraint_transform),
-                                    options_.loop_closure_translation_weight(),
-                                    options_.loop_closure_rotation_weight()},
-                                   Constraint::INTER_SUBMAP});
+
+  const transform::Rigid2d difference =
+          initial_pose.inverse() * pose_estimate;
+  
+  std::cout << "\n\n\n!!!!!\n" <<
+              "CONSTRAINT TRANSFORM: " + std::to_string(constraint_transform.translation().norm()) + "\n" +
+              "TRANSFORM DIFFERENCE: " + std::to_string(difference.translation().norm()) +
+  "\n!!!!!\n\n" << std::endl;
+  
+  if (difference.translation().norm() <= 1.0)
+  {
+    constraint->reset(new Constraint{submap_id,
+                                    node_id,
+                                    {transform::Embed3D(constraint_transform),
+                                      options_.loop_closure_translation_weight(),
+                                      options_.loop_closure_rotation_weight()},
+                                    Constraint::INTER_SUBMAP});
+  }
 
   if (options_.log_matches()) {
     std::ostringstream info;
