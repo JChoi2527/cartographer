@@ -48,12 +48,23 @@ bool MotionFilter::IsSimilar(const common::Time time,
       (pose.translation() - last_pose_.translation()).norm() <=
           options_.max_distance_meters() &&
       transform::GetAngle(pose.inverse() * last_pose_) <=
-          options_.max_angle_radians()) {
+          options_.max_angle_radians() &&
+          MatchSubmap::getFirstFullMatchSubmap() == true ) { 
     return true;
   }
   last_time_ = time;
   last_pose_ = pose;
   ++num_different_;
+
+  // to check if it's working. If test's done, remove them.
+  if(MatchSubmap::getFirstFullMatchSubmap() == false) {
+    std::cout << "FULL MATCH NOT YET" << std::endl;
+    std::cout << "FULL MATCH NOT YET" << std::endl;
+    std::cout << "IT is not similar!!" << std::endl;
+    std::cout << "IT is not similar!!" << std::endl;
+    std::cout << "return false because full match has not been occured." << std::endl;
+    std::cout << "return false because full match has not been occured." << std::endl;
+  }
   return false;
 }
 

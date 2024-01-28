@@ -23,6 +23,7 @@
 #include "cartographer/common/time.h"
 #include "cartographer/mapping/proto/motion_filter_options.pb.h"
 #include "cartographer/transform/rigid_transform.h"
+#include "cartographer/mapping/2d/match_submap.h"
 
 namespace cartographer {
 namespace mapping {

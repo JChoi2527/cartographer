@@ -40,6 +40,7 @@
 #include "glog/logging.h"
 
 bool MatchSubmap::s_full_match_submap_ = false; // static init
+bool MatchSubmap::s_is_first_match_done = false; // static init
 
 namespace cartographer {
 namespace mapping {
