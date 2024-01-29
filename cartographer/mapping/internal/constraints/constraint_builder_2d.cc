@@ -65,7 +65,12 @@ ConstraintBuilder2D::ConstraintBuilder2D(
       thread_pool_(thread_pool),
       finish_node_task_(absl::make_unique<common::Task>()),
       when_done_task_(absl::make_unique<common::Task>()),
-      ceres_scan_matcher_(options.ceres_scan_matcher_options()) {}
+      ceres_scan_matcher_(options.ceres_scan_matcher_options()) 
+{
+  localGuess = std::make_unique<transform::Rigid2d>();
+  globalGuess = std::make_unique<transform::Rigid2d>();
+
+}
 
 ConstraintBuilder2D::~ConstraintBuilder2D() {
   absl::MutexLock locker(&mutex_);
@@ -220,9 +225,9 @@ void ConstraintBuilder2D::ComputeConstraint(
       CHECK_GE(submap_id.trajectory_id, 0);
       kGlobalConstraintsFoundMetric->Increment();
       kGlobalConstraintScoresMetric->Observe(score);
-      //jylee modified 2014-01-20
-      localGuess= std::make_unique<transform::Rigid2d>(pose_estimate.translation(), pose_estimate.rotation());
       MatchSubmap::setFullMatchSubmap(true); // added by Gunther
+      //jylee modified 2014-01-20
+      globalGuess= std::make_unique<transform::Rigid2d>(pose_estimate.translation(), pose_estimate.rotation());
     } else {
       return;
     }
@@ -237,8 +242,10 @@ void ConstraintBuilder2D::ComputeConstraint(
       kConstraintsFoundMetric->Increment();
       kConstraintScoresMetric->Observe(score);
       /// 추가로 계속 수행 됨;
+
       //jylee modified 2014-01-20
       localGuess= std::make_unique<transform::Rigid2d>(pose_estimate.translation(), pose_estimate.rotation());
+      
     } else {
       return;
     }
@@ -247,6 +254,9 @@ void ConstraintBuilder2D::ComputeConstraint(
     absl::MutexLock locker(&mutex_);
     score_histogram_.Add(score);
   }
+
+
+
 
   // Use the CSM estimate as both the initial and previous pose. This has the
   // effect that, in the absence of better information, we prefer the original
@@ -268,10 +278,19 @@ void ConstraintBuilder2D::ComputeConstraint(
 
   if (match_full_submap)
   {
-    if ((constraint_transform_global_guess.inverse() * constraint_transform_local_guess).translation().norm() > 2.0 )
-      return;
+    double differ = (constraint_transform_global_guess.inverse() * constraint_transform_local_guess).translation().norm();
+    if (this->firstTime) this->firstTime = false;
+    else {
+      if (differ > 3.0)
+      {
+        std::cout << "\n\n\n\n\n\n\n\n rejected\n" << "difference norm : " << std::setprecision(2) << differ << std::endl ;
+        return;
+      }
+    }
+
   }
   //
+
 
   constraint->reset(new Constraint{submap_id,
                                    node_id,
