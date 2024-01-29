@@ -47,6 +47,8 @@ class MotionFilter {
   int num_different_ = 0;
   common::Time last_time_;
   transform::Rigid3d last_pose_;
+
+  MatchSubmap matchSubmap;
 };
 
 }  // namespace mapping
