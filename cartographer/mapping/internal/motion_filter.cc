@@ -49,22 +49,19 @@ bool MotionFilter::IsSimilar(const common::Time time,
           options_.max_distance_meters() &&
       transform::GetAngle(pose.inverse() * last_pose_) <=
           options_.max_angle_radians() &&
-          MatchSubmap::getFirstFullMatchSubmap() == true ) { 
+          MatchSubmap::getFirstFullMatchSubmap() == true ) {
+        // once setFirstFullMatchSubmap() called, then getFirstFullMatchSubamp will always be true.
     return true;
   }
   last_time_ = time;
   last_pose_ = pose;
   ++num_different_;
-
   // to check if it's working. If test's done, remove them.
-  if(MatchSubmap::getFirstFullMatchSubmap() == false) {
-    std::cout << "FULL MATCH NOT YET" << std::endl;
-    std::cout << "FULL MATCH NOT YET" << std::endl;
-    std::cout << "IT is not similar!!" << std::endl;
-    std::cout << "IT is not similar!!" << std::endl;
-    std::cout << "return false because full match has not been occured." << std::endl;
-    std::cout << "return false because full match has not been occured." << std::endl;
-  }
+//   if(MatchSubmap::getFirstFullMatchSubmap() == false) {
+//     std::cout << "FULL MATCH NOT YET" << std::endl;
+//     std::cout << "IT is not similar!!" << std::endl;
+//     std::cout << "return false because full match has not been occurred." << std::endl;
+//   }
   return false;
 }
 
