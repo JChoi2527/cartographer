@@ -15,6 +15,7 @@ void MatchSubmap::setFullMatchSubmap(bool state) {
 
     if(!s_is_first_match_done) { // only one time.
         std::cout << "Full Match Submap Occurred for the first time!" << std::endl;
+        std::cout << "Full Match Submap Occurred for the first time!" << std::endl;
         s_is_first_match_done = true;
     }
 }
@@ -23,10 +24,10 @@ void MatchSubmap::setLocalMatchSubmap(bool state) {
     s_local_match_submap_ = state;
 
     std::cout << "local_match_submap : " << s_local_match_submap_ << std::endl;
-    std::cout << "local_match_submap : " << s_local_match_submap_ << std::endl;
 
     if(!s_is_first_match_done) { // only one time either setFullMatchSubmap() or setLocalMatchSubmap()
-        std::cout << "local Match Submap Occurred for the first time!" << std::endl;
+        std::cout << "Local Match Submap Occurred for the first time!" << std::endl;
+        std::cout << "Local Match Submap Occurred for the first time!" << std::endl;
         s_is_first_match_done = true;
     }
 
