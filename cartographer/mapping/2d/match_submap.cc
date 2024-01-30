@@ -45,7 +45,7 @@ bool MatchSubmap::getFirstMatchSubmap() {
 
 bool MatchSubmap::delayTime() {
     this->duration_time = std::chrono::steady_clock::now() - this->start_time;
-    if(this->duration_time > std::chrono::seconds{30} ) {
+    if(this->duration_time > std::chrono::seconds{50} ) {
         // std::cout << "more then 30 seconds past.." << std::endl;
         // std::cout << "more then 30 seconds past.." << std::endl;
         return true;

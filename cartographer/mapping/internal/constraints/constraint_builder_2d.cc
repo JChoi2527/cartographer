@@ -265,16 +265,24 @@ void ConstraintBuilder2D::ComputeConstraint(
                               std::pow(pose_estimate_translation.y() - initial_pose_translation.y(), 2));
 
   std::cout <<  "\n\n\n!!!!!\n" <<
-                "CONSTRAINT TRANSFORM: " + std::to_string(constraint_transform.translation().norm()) + "\n" +
-                "TRANSFORM DIFFERENCE: " + std::to_string(distance) +
-                "\n!!!!!\n\n" << std::endl;
-  
-  if (distance < 0.8)
+                "CONSTRAINT TRANSFORM: " << std::setprecision(2) << std::to_string(constraint_transform.translation().norm()) << "\n" <<
+                "TRANSFORM DIFFERENCE: " << std::setprecision(2) << std::to_string(distance) << std::endl;
+
+  if (distance < 1.00 || !match_full_submap || !matchSubmap.delayTime())
   {
-    // std::cout <<  "\n\n\n!!!!!\n" <<
-    //               "CONSTRAINT TRANSFORM: " + std::to_string(constraint_transform.translation().norm()) + "\n" +
-    //               "TRANSFORM DIFFERENCE: " + std::to_string(difference.translation().norm()) +
-    //               "\n!!!!!\n\n" << std::endl;
+    if (!match_full_submap)
+    {
+      std::cout << "local match" << std::endl;
+    }
+    else
+    {
+      std::cout << "global match" << std::endl;
+    }
+
+    if (!matchSubmap.delayTime())
+    {
+      std::cout << "match submap delay time is false" << std::endl;
+    }
 
     constraint->reset(new Constraint{submap_id,
                                     node_id,
@@ -283,6 +291,11 @@ void ConstraintBuilder2D::ComputeConstraint(
                                       options_.loop_closure_rotation_weight()},
                                     Constraint::INTER_SUBMAP});
   }
+  else
+  {
+    std::cout << "CONSTRAINT MOVE SKIPPED" << std::endl;
+  }
+  std::cout << "!!!!!\n\n" << std::endl;
 
   if (options_.log_matches()) {
     std::ostringstream info;
