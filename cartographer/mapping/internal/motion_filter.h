@@ -23,6 +23,7 @@
 #include "cartographer/common/time.h"
 #include "cartographer/mapping/proto/motion_filter_options.pb.h"
 #include "cartographer/transform/rigid_transform.h"
+#include "cartographer/mapping/2d/match_submap.h"
 
 namespace cartographer {
 namespace mapping {
@@ -46,6 +47,8 @@ class MotionFilter {
   int num_different_ = 0;
   common::Time last_time_;
   transform::Rigid3d last_pose_;
+
+  MatchSubmap matchSubmap;
 };
 
 }  // namespace mapping

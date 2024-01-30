@@ -43,12 +43,28 @@ bool MotionFilter::IsSimilar(const common::Time time,
       << "Motion filter reduced the number of nodes to "
       << 100. * num_different_ / num_total_ << "%.";
   ++num_total_;
+  std::chrono::duration<double> chk_seconds = common::FromSeconds(options_.max_time_seconds());
+
+    if(MatchSubmap::getFirstMatchSubmap() == false) {
+    // std::cout << "FULL MATCH || OR LOCAL MATCHED NOT YET" << std::endl;
+    // std::cout << "set time: 0.2 seconds" << std::endl;
+    chk_seconds = common::FromSeconds(0.2);
+  } else {
+    bool res = this->matchSubmap.delayTime();
+    if(res == false) {
+        // std::cout << "FULL MATCHED!! or LOCAL MATCHED BUT!!" << std::endl;
+        // std::cout << "set time: 0.2 seconds" << std::endl;
+        // std::cout << "Need more 30 seconds..!!" << std::endl;
+        chk_seconds = common::FromSeconds(0.2);
+    }
+  }
+
   if (num_total_ > 1 &&
-      time - last_time_ <= common::FromSeconds(options_.max_time_seconds()) &&
+      time - last_time_ <= chk_seconds &&
       (pose.translation() - last_pose_.translation()).norm() <=
           options_.max_distance_meters() &&
       transform::GetAngle(pose.inverse() * last_pose_) <=
-          options_.max_angle_radians()) {
+          options_.max_angle_radians() ) {
     return true;
   }
   last_time_ = time;
