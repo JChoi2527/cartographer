@@ -255,12 +255,33 @@ void ConstraintBuilder2D::ComputeConstraint(
 
   const transform::Rigid2d constraint_transform =
       ComputeSubmapPose(*submap).inverse() * pose_estimate;
-  constraint->reset(new Constraint{submap_id,
-                                   node_id,
-                                   {transform::Embed3D(constraint_transform),
-                                    options_.loop_closure_translation_weight(),
-                                    options_.loop_closure_rotation_weight()},
-                                   Constraint::INTER_SUBMAP});
+
+  auto initial_pose_translation = initial_pose.translation();
+  auto pose_estimate_translation = pose_estimate.translation();
+
+  // Calculate Euclidean distance
+  double distance = std::sqrt(std::pow(pose_estimate_translation.x() - initial_pose_translation.x(), 2) +
+                              std::pow(pose_estimate_translation.y() - initial_pose_translation.y(), 2));
+
+  std::cout <<  "\n\n\n!!!!!\n" <<
+                "CONSTRAINT TRANSFORM: " + std::to_string(constraint_transform.translation().norm()) + "\n" +
+                "TRANSFORM DIFFERENCE: " + std::to_string(distance) +
+                "\n!!!!!\n\n" << std::endl;
+  
+  if (distance < 0.8)
+  {
+    // std::cout <<  "\n\n\n!!!!!\n" <<
+    //               "CONSTRAINT TRANSFORM: " + std::to_string(constraint_transform.translation().norm()) + "\n" +
+    //               "TRANSFORM DIFFERENCE: " + std::to_string(difference.translation().norm()) +
+    //               "\n!!!!!\n\n" << std::endl;
+
+    constraint->reset(new Constraint{submap_id,
+                                    node_id,
+                                    {transform::Embed3D(constraint_transform),
+                                      options_.loop_closure_translation_weight(),
+                                      options_.loop_closure_rotation_weight()},
+                                    Constraint::INTER_SUBMAP});
+  }
 
   if (options_.log_matches()) {
     std::ostringstream info;
