@@ -43,11 +43,17 @@ bool MatchSubmap::getFirstMatchSubmap() {
     return false;
 }
 
+/// @brief  to delay time as limit_second (now 50). Once it reached at the limit_second (50), result will always be true.
+/// @return 
 bool MatchSubmap::delayTime() {
+    if(this->is_limit_second_done) {
+        return true; // no more caculating duration_time 
+    }
+
     this->duration_time = std::chrono::steady_clock::now() - this->start_time;
-    if(this->duration_time > std::chrono::seconds{30} ) {
-        // std::cout << "more then 30 seconds past.." << std::endl;
-        // std::cout << "more then 30 seconds past.." << std::endl;
+    if(this->duration_time > std::chrono::seconds{this->limit_second} ) {
+        std::cout << "more then " << this->limit_second << " seconds past.." << std::endl;
+        this->is_limit_second_done = true;
         return true;
     }
     return false;

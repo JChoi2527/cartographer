@@ -6,6 +6,9 @@
 #include <thread>
 
 class MatchSubmap {
+private:
+    bool is_limit_second_done = false;
+    int limit_second = 50;
 
 public:
     MatchSubmap();
