@@ -256,13 +256,26 @@ void ConstraintBuilder2D::ComputeConstraint(
 
   const transform::Rigid2d constraint_transform =
       ComputeSubmapPose(*submap).inverse() * pose_estimate;
-  constraint->reset(new Constraint{submap_id,
+  if (firstTime)
+  {
+    constraint->reset(new Constraint{submap_id,
+                                   node_id,
+                                   {transform::Embed3D(constraint_transform),
+                                    10000.0,
+                                    110000.0},
+                                   Constraint::INTER_SUBMAP});
+    firstTime= false;
+  }
+  else
+  {
+    constraint->reset(new Constraint{submap_id,
                                    node_id,
                                    {transform::Embed3D(constraint_transform),
                                     options_.loop_closure_translation_weight(),
                                     options_.loop_closure_rotation_weight()},
                                    Constraint::INTER_SUBMAP});
-
+  } 
+  
   if (options_.log_matches()) {
     std::ostringstream info;
     info << "Node " << node_id << " with "

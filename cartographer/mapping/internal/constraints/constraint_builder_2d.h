@@ -168,6 +168,8 @@ class ConstraintBuilder2D {
 
   // Histogram of scan matcher scores.
   common::Histogram score_histogram_ GUARDED_BY(mutex_);
+
+  bool firstTime = true;
 };
 
 }  // namespace constraints
