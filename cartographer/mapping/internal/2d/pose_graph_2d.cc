@@ -291,8 +291,13 @@ void PoseGraph2D::ComputeConstraint(const NodeId& node_id,
       // the submap's trajectory, it suffices to do a match constrained to a
       // local search window.
       maybe_add_local_constraint = true;
+      constraint_builder_.setConstraintMinScore(constraint_builder_.constraintBuilderMinScoreDefault);
     } else if (global_localization_samplers_[node_id.trajectory_id]->Pulse()) {
       maybe_add_global_constraint = true;
+    }
+    else
+    {
+      constraint_builder_.setConstraintMinScore(constraint_builder_.constraintBuilderMinScoreDefault*0.60);
     }
     constant_data = data_.trajectory_nodes.at(node_id).constant_data.get();
     submap = static_cast<const Submap2D*>(

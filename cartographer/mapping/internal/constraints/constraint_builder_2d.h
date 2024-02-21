@@ -106,6 +106,9 @@ class ConstraintBuilder2D {
   void DeleteScanMatcher(const SubmapId& submap_id);
 
   static void RegisterMetrics(metrics::FamilyFactory* family_factory);
+  void setConstraintMinScore(double val);
+  double constraintBuilderMinScore;
+  double constraintBuilderMinScoreDefault;
 
  private:
   struct SubmapScanMatcher {
@@ -170,6 +173,7 @@ class ConstraintBuilder2D {
   common::Histogram score_histogram_ GUARDED_BY(mutex_);
 
   bool firstTime = true;
+
 };
 
 }  // namespace constraints

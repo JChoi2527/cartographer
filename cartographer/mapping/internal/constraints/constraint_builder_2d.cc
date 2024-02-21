@@ -67,7 +67,12 @@ ConstraintBuilder2D::ConstraintBuilder2D(
       thread_pool_(thread_pool),
       finish_node_task_(absl::make_unique<common::Task>()),
       when_done_task_(absl::make_unique<common::Task>()),
-      ceres_scan_matcher_(options.ceres_scan_matcher_options()) {}
+      ceres_scan_matcher_(options.ceres_scan_matcher_options()) 
+{
+  this->constraintBuilderMinScore = options_.min_score();
+  this->constraintBuilderMinScoreDefault = options_.min_score();
+
+}
 
 ConstraintBuilder2D::~ConstraintBuilder2D() {
   absl::MutexLock locker(&mutex_);
@@ -230,9 +235,9 @@ void ConstraintBuilder2D::ComputeConstraint(
     kConstraintsSearchedMetric->Increment();
     if (submap_scan_matcher.fast_correlative_scan_matcher->Match(
             initial_pose, constant_data->filtered_gravity_aligned_point_cloud,
-            options_.min_score(), &score, &pose_estimate)) {
+            constraintBuilderMinScore, &score, &pose_estimate)) {
       // We've reported a successful local match.
-      CHECK_GT(score, options_.min_score());
+      //CHECK_GT(score, constraintBuilderMinScore);
       kConstraintsFoundMetric->Increment();
       kConstraintScoresMetric->Observe(score);
       MatchSubmap::setLocalMatchSubmap(true);
@@ -266,7 +271,15 @@ void ConstraintBuilder2D::ComputeConstraint(
                                    Constraint::INTER_SUBMAP});
     firstTime= false;
   }
-  else
+  else if (match_full_submap)
+  {
+    constraint->reset(new Constraint{submap_id,
+                                   node_id,
+                                   {transform::Embed3D(constraint_transform),
+                                    options_.loop_closure_translation_weight()*0.01,
+                                    options_.loop_closure_rotation_weight()*0.01},
+                                   Constraint::INTER_SUBMAP});
+  } else
   {
     constraint->reset(new Constraint{submap_id,
                                    node_id,
@@ -274,7 +287,7 @@ void ConstraintBuilder2D::ComputeConstraint(
                                     options_.loop_closure_translation_weight(),
                                     options_.loop_closure_rotation_weight()},
                                    Constraint::INTER_SUBMAP});
-  } 
+  }
   
   if (options_.log_matches()) {
     std::ostringstream info;
@@ -359,6 +372,11 @@ void ConstraintBuilder2D::RegisterMetrics(metrics::FamilyFactory* factory) {
       "mapping_constraints_constraint_builder_2d_num_submap_scan_matchers",
       "Current number of constructed submap scan matchers");
   kNumSubmapScanMatchersMetric = num_matchers->Add({});
+}
+
+void ConstraintBuilder2D::setConstraintMinScore(double val)
+{
+  constraintBuilderMinScore = val;
 }
 
 }  // namespace constraints
