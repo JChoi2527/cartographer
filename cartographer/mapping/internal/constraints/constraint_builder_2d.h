@@ -81,6 +81,13 @@ class ConstraintBuilder2D {
                           const TrajectoryNode::Data* const constant_data,
                           const transform::Rigid2d& initial_relative_pose);
 
+  void MaybeAddConstraint_modi(const SubmapId& submap_id, const Submap2D* submap,
+                          const NodeId& node_id,
+                          const TrajectoryNode::Data* const constant_data,
+                          const transform::Rigid2d& initial_relative_pose,
+                          const transform::Rigid2d& globalPose2dOfNode,
+                          const transform::Rigid2d& localToGlobalTfSubmap);
+
   // Schedules exploring a new constraint between 'submap' identified by
   // 'submap_id' and the 'compressed_point_cloud' for 'node_id'.
   // This performs full-submap matching.
@@ -90,6 +97,13 @@ class ConstraintBuilder2D {
   void MaybeAddGlobalConstraint(
       const SubmapId& submap_id, const Submap2D* submap, const NodeId& node_id,
       const TrajectoryNode::Data* const constant_data);
+
+  void MaybeAddGlobalConstraint_modi(
+      const SubmapId& submap_id, const Submap2D* submap, const NodeId& node_id,
+      const TrajectoryNode::Data* const constant_data,
+      const transform::Rigid2d& globalPose2dOfNode,
+      const transform::Rigid2d& localToGlobalTfSubmap
+      );
 
   // Must be called after all computations related to one node have been added.
   void NotifyEndOfNode();
@@ -134,6 +148,27 @@ class ConstraintBuilder2D {
                          const SubmapScanMatcher& submap_scan_matcher,
                          std::unique_ptr<Constraint>* constraint)
       LOCKS_EXCLUDED(mutex_);
+
+  void ComputeConstraint_GlobalCase(const SubmapId& submap_id, const Submap2D* submap,
+                         const NodeId& node_id,
+                         const TrajectoryNode::Data* const constant_data,
+                         const transform::Rigid2d& initial_relative_pose,
+                         const SubmapScanMatcher& submap_scan_matcher,
+                         std::unique_ptr<Constraint>* constraint,
+                         const transform::Rigid2d& globalPose2dOfNode,
+                         const transform::Rigid2d& localToGlobalTfSubmap)
+      LOCKS_EXCLUDED(mutex_);
+
+  void ComputeConstraint_LocalCase(const SubmapId& submap_id, const Submap2D* submap,
+                         const NodeId& node_id,
+                         const TrajectoryNode::Data* const constant_data,
+                         const transform::Rigid2d& initial_relative_pose,
+                         const SubmapScanMatcher& submap_scan_matcher,
+                         std::unique_ptr<Constraint>* constraint,
+                         const transform::Rigid2d& globalPose2dOfNode,
+                         const transform::Rigid2d& localToGlobalTfSubmap)
+      LOCKS_EXCLUDED(mutex_);
+
 
   void RunWhenDoneCallback() LOCKS_EXCLUDED(mutex_);
 

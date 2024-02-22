@@ -297,12 +297,15 @@ void PoseGraph2D::ComputeConstraint(const NodeId& node_id,
     }
     else
     {
-      constraint_builder_.setConstraintMinScore(constraint_builder_.constraintBuilderMinScoreDefault*0.60);
+      constraint_builder_.setConstraintMinScore(constraint_builder_.constraintBuilderMinScoreDefault*0.80);
     }
     constant_data = data_.trajectory_nodes.at(node_id).constant_data.get();
     submap = static_cast<const Submap2D*>(
         data_.submap_data.at(submap_id).submap.get());
   }
+
+  transform::Rigid2d localToGlobalTfSubmap =
+      transform::Project2D(GetLocalToGlobalTransform(submap_id.trajectory_id));
 
   if (maybe_add_local_constraint) {
     const transform::Rigid2d initial_relative_pose =
@@ -310,11 +313,17 @@ void PoseGraph2D::ComputeConstraint(const NodeId& node_id,
             .at(submap_id)
             .global_pose.inverse() *
         optimization_problem_->node_data().at(node_id).global_pose_2d;
-    constraint_builder_.MaybeAddConstraint(
-        submap_id, submap, node_id, constant_data, initial_relative_pose);
+    const transform::Rigid2d globalPoseNode =
+        optimization_problem_->node_data().at(node_id).global_pose_2d;
+    constraint_builder_.MaybeAddConstraint_modi(
+        submap_id, submap, node_id, constant_data, initial_relative_pose,
+        globalPoseNode, localToGlobalTfSubmap);
   } else if (maybe_add_global_constraint) {
-    constraint_builder_.MaybeAddGlobalConstraint(submap_id, submap, node_id,
-                                                 constant_data);
+    const transform::Rigid2d globalPoseNode =
+        optimization_problem_->node_data().at(node_id).global_pose_2d;
+    constraint_builder_.MaybeAddGlobalConstraint_modi(submap_id, submap, node_id,
+                                        constant_data,
+                                        globalPoseNode, localToGlobalTfSubmap);
   }
 }
 
