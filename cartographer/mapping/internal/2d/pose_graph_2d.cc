@@ -297,7 +297,7 @@ void PoseGraph2D::ComputeConstraint(const NodeId& node_id,
     }
     else
     {
-      constraint_builder_.setConstraintMinScore(constraint_builder_.constraintBuilderMinScoreDefault*0.80);
+      constraint_builder_.setConstraintMinScore(constraint_builder_.constraintBuilderMinScoreDefault*1.0);
     }
     constant_data = data_.trajectory_nodes.at(node_id).constant_data.get();
     submap = static_cast<const Submap2D*>(

@@ -460,7 +460,7 @@ void ConstraintBuilder2D::ComputeConstraint_LocalCase(
   const transform::Rigid2d node_global_pose_submap_origin =
       localToGlobalTfSubmap * pose_estimate;
   if ((globalPose2dOfNode.inverse()*node_global_pose_submap_origin).
-      translation().norm()> 1.0)  // 1.3 means meter..should be parametered.
+      translation().norm()> 1.3)  // 1.3 means meter..should be parametered.
   {
     //std::cout << "reject by global difference!!  " << node_id << "  " << submap_id << std::endl;
     //std::cout << "differ : " << localToGlobalTfSubmap.translation().norm() << std::endl;
@@ -514,10 +514,10 @@ void ConstraintBuilder2D::ComputeConstraint_GlobalCase(
   const transform::Rigid2d submapOriginGlobalPose = localToGlobalTfSubmap * submapLocalPose;
   const transform::Rigid2d initial_pose = submapLocalPose * initial_relative_pose;
 
-  if ( (submapOriginGlobalPose.inverse()*globalPose2dOfNode).translation().norm() >
-      options_.max_constraint_distance()) {
-    return;
-  }
+  //if ( (submapOriginGlobalPose.inverse()*globalPose2dOfNode).translation().norm() >
+  //    options_.max_constraint_distance()) {
+  //  return;
+  //}
 
   //prevent from comparing newly made submap in traj 1  with traj0 nodes.
   if (submap_id.trajectory_id == 1 && node_id.trajectory_id == 0) return;
@@ -549,6 +549,34 @@ void ConstraintBuilder2D::ComputeConstraint_GlobalCase(
     kGlobalConstraintScoresMetric->Observe(score);
     MatchSubmap::setFullMatchSubmap(true); // added by Gunther
 
+    if (!firstTime)
+    {
+      const transform::Rigid2d node_global_pose_submap_origin =
+          localToGlobalTfSubmap * pose_estimate;
+      if ((globalPose2dOfNode.inverse()*node_global_pose_submap_origin).
+          translation().norm()> 2.0   // 1.3 means meter..should be parametered.
+          || std::abs(
+          (globalPose2dOfNode.inverse()*node_global_pose_submap_origin).normalized_angle()) >0.524)
+
+      {
+        std::cout << "reject by fullmatch(fastcorrel) difference!!  " << node_id << "  " << submap_id << std::endl;
+        std::cout << "differ : "
+                  << (globalPose2dOfNode.inverse()*node_global_pose_submap_origin).
+                    translation().norm() << "  " 
+                  << (globalPose2dOfNode.inverse()*node_global_pose_submap_origin).normalized_angle()  
+                  << std::endl;
+        return;
+      }
+      else
+      {
+        std::cout << "accept by fullmatch(fastcorrel) difference!!  " << node_id << "  " << submap_id << std::endl;
+        std::cout << "differ : "
+                  << (globalPose2dOfNode.inverse()*node_global_pose_submap_origin).
+                    translation().norm()
+                  << std::endl;
+      }
+    }
+
   } else {
     return;
   }
@@ -575,7 +603,7 @@ void ConstraintBuilder2D::ComputeConstraint_GlobalCase(
     const transform::Rigid2d node_global_pose_submap_origin =
         localToGlobalTfSubmap * pose_estimate;
     if ((globalPose2dOfNode.inverse()*node_global_pose_submap_origin).
-        translation().norm()> 1.0   // 1.3 means meter..should be parametered.
+        translation().norm()> 2.0   // 1.3 means meter..should be parametered.
         || std::abs(
         (globalPose2dOfNode.inverse()*node_global_pose_submap_origin).normalized_angle()) >0.524)
 
