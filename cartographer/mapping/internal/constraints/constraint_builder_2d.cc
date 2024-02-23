@@ -138,7 +138,11 @@ void ConstraintBuilder2D::MaybeAddConstraint_modi(
   const transform::Rigid2d node_global_pose_submap_origin =
       localToGlobalTfSubmap * ComputeSubmapPose(*submap) * initial_relative_pose;
   if ((globalPose2dOfNode.inverse()*node_global_pose_submap_origin).
-      translation().norm()> 1.0)  // 1.3 means meter..should be parametered.
+      translation().norm()> 1.0  // 1.3 means meter..should be parametered.
+      || std::abs(
+          (globalPose2dOfNode.inverse()*node_global_pose_submap_origin).normalized_angle()) > 0.314)
+
+
   {
     //std::cout << "reject by global difference!!  " << node_id << "  " << submap_id << std::endl;
     //std::cout << "differ : " << localToGlobalTfSubmap.translation().norm() << std::endl;
@@ -460,7 +464,11 @@ void ConstraintBuilder2D::ComputeConstraint_LocalCase(
   const transform::Rigid2d node_global_pose_submap_origin =
       localToGlobalTfSubmap * pose_estimate;
   if ((globalPose2dOfNode.inverse()*node_global_pose_submap_origin).
-      translation().norm()> 1.3)  // 1.3 means meter..should be parametered.
+      translation().norm()> 1.3  // 1.3 means meter..should be parametered.
+      || std::abs(
+          (globalPose2dOfNode.inverse()*node_global_pose_submap_origin).normalized_angle()) > 0.314)
+
+
   {
     //std::cout << "reject by global difference!!  " << node_id << "  " << submap_id << std::endl;
     //std::cout << "differ : " << localToGlobalTfSubmap.translation().norm() << std::endl;

@@ -307,6 +307,9 @@ void PoseGraph2D::ComputeConstraint(const NodeId& node_id,
   transform::Rigid2d localToGlobalTfSubmap =
       transform::Project2D(GetLocalToGlobalTransform(submap_id.trajectory_id));
 
+
+
+
   if (maybe_add_local_constraint) {
     const transform::Rigid2d initial_relative_pose =
         optimization_problem_->submap_data()
