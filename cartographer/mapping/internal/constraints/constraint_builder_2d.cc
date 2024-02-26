@@ -138,7 +138,7 @@ void ConstraintBuilder2D::MaybeAddConstraint_modi(
   const transform::Rigid2d node_global_pose_submap_origin =
       localToGlobalTfSubmap * ComputeSubmapPose(*submap) * initial_relative_pose;
   if ((globalPose2dOfNode.inverse()*node_global_pose_submap_origin).
-      translation().norm()> 1.0)  // 1.3 means meter..should be parametered.
+      translation().norm()> 1.3)  // 1.3 means meter..should be parametered.
   {
     //std::cout << "reject by global difference!!  " << node_id << "  " << submap_id << std::endl;
     //std::cout << "differ : " << localToGlobalTfSubmap.translation().norm() << std::endl;
@@ -156,7 +156,7 @@ void ConstraintBuilder2D::MaybeAddConstraint_modi(
 
 
   //prevent from comparing newly made submap in traj 1  with traj0 nodes.
-  if (submap_id.trajectory_id == 1 && node_id.trajectory_id==0) return;
+  //if (submap_id.trajectory_id == 1 && node_id.trajectory_id==0) return;
 
   //std::cout << "accepted by global difference!!  " << node_id << "  " << submap_id << std::endl;
   //std::cout << "differ : " << localToGlobalTfSubmap.translation().norm() << std::endl;
@@ -460,7 +460,7 @@ void ConstraintBuilder2D::ComputeConstraint_LocalCase(
   const transform::Rigid2d node_global_pose_submap_origin =
       localToGlobalTfSubmap * pose_estimate;
   if ((globalPose2dOfNode.inverse()*node_global_pose_submap_origin).
-      translation().norm()> 1.3)  // 1.3 means meter..should be parametered.
+      translation().norm()> 0.8)  // 1.3 means meter..should be parametered.
   {
     //std::cout << "reject by global difference!!  " << node_id << "  " << submap_id << std::endl;
     //std::cout << "differ : " << localToGlobalTfSubmap.translation().norm() << std::endl;
@@ -520,7 +520,7 @@ void ConstraintBuilder2D::ComputeConstraint_GlobalCase(
   //}
 
   //prevent from comparing newly made submap in traj 1  with traj0 nodes.
-  if (submap_id.trajectory_id == 1 && node_id.trajectory_id == 0) return;
+  //if (submap_id.trajectory_id == 1 && node_id.trajectory_id == 0) return;
 
 
 
@@ -635,8 +635,8 @@ void ConstraintBuilder2D::ComputeConstraint_GlobalCase(
     constraint->reset(new Constraint{submap_id,
                                      node_id,
                                      {transform::Embed3D(constraint_transform),
-                                      10000.0,
-                                      110000.0},
+                                      100000.0,
+                                      1100000.0},
                                      Constraint::INTER_SUBMAP});
     firstTime= false;
   }
